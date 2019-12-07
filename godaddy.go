@@ -3,8 +3,11 @@ package godaddy
 // SPDX-License-Identifier: ISC
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 )
@@ -14,6 +17,33 @@ type Client struct {
 	Key    string
 	Secret string
 	OTE    bool
+}
+
+// Error presents a generic error class
+type Error struct {
+	Code    string
+	Fields  []ErrorField
+	Message string
+}
+
+func (e *Error) Error() string {
+	return e.Message
+}
+
+// ErrorField components are used to specify precise errors from an Error
+type ErrorField struct {
+	Code        string
+	Message     string
+	Path        string
+	PathRelated string
+}
+
+// ErrorLimit is presented specifically when errors occur due to rate limiting
+type ErrorLimit struct {
+	Code          string
+	Fields        []ErrorField
+	Message       string
+	RetryAfterSec int
 }
 
 // GetURL is a helper function returning the API base URL for all API calls.
@@ -30,10 +60,10 @@ func (c *Client) GetURL() string {
 	return "https://api.godaddy.com"
 }
 
-// Get does things
-func (c *Client) Get() (*http.Response, error) {
+// Get processes core API integration via HTTP GET requests
+func (c *Client) Get(method string) ([]byte, error) {
 	client := new(http.Client)
-	req, err := http.NewRequest("GET", c.GetURL(), nil)
+	req, err := http.NewRequest("GET", c.GetURL()+method, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -42,8 +72,66 @@ func (c *Client) Get() (*http.Response, error) {
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 
-	return resp, err
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		e := new(Error)
+
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return nil, err
+		}
+
+		return data, e
+	}
+
+	return data, nil
+}
+
+// Post processes core API integration via HTTP POST requests
+func (c *Client) Post(method string, body []byte) ([]byte, error) {
+	client := new(http.Client)
+	req, err := http.NewRequest("POST", c.GetURL()+method, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("sso-key %s:%s", c.Key, c.Secret))
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		e := new(Error)
+
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return nil, err
+		}
+
+		return data, e
+	}
+
+	return data, nil
 }
 
 func checkEnvOrGiveString(env string, value string) string {

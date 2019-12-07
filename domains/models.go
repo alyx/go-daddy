@@ -1,5 +1,7 @@
 package domains
 
+import "github.com/alyx/godaddy"
+
 type Address struct {
 	Address1   string
 	Address2   string
@@ -160,12 +162,6 @@ type DomainContactsBulk struct {
 	EntityType      string
 }
 
-type Error struct {
-	Code    string
-	Fields  []ErrorField
-	Message string
-}
-
 type ErrorDomainContactsValidate struct {
 	Code    string
 	Fields  []ErrorFieldDomainContactsValidate
@@ -173,23 +169,9 @@ type ErrorDomainContactsValidate struct {
 	Stack   []string
 }
 
-type ErrorField struct {
-	Code        string
-	Message     string
-	Path        string
-	PathRelated string
-}
-
 type ErrorFieldDomainContactsValidate struct {
-	ErrorField
+	godaddy.ErrorField
 	Domains []string
-}
-
-type ErrorLimit struct {
-	Code          string
-	Fields        []ErrorField
-	Message       string
-	RetryAfterSec int
 }
 
 type LegalAgreement struct {
