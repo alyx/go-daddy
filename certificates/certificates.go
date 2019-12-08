@@ -144,22 +144,79 @@ func AddCallback(c *godaddy.Client, id string, cb string) error {
 }
 
 // Cancel a pending certificate
-func Cancel() {}
+func Cancel(c *godaddy.Client, id string) error {
+	_, err := c.Post("/v1/certificates/"+id+"/cancel", nil)
+
+	return err
+}
 
 // Download certificate
-func Download() {}
+func Download(c *godaddy.Client, id string) (*Bundle, error) {
+	res := new(Bundle)
+
+	data, err := c.Get("/v1/certificates/" + id + "/download")
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
 
 // Reissue the active certificate
-func Reissue() {}
+func Reissue(c *godaddy.Client, id string, body *CertificateReissue) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Post("/v1/certificates/"+id+"/reissue", enc)
+
+	return err
+}
 
 // Renew the active certificate
-func Renew() {}
+func Renew(c *godaddy.Client, id string, body *CertificateRenew) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Post("/v1/certificates/"+id+"/renew", enc)
+
+	return err
+}
 
 // Revoke the active certificate
-func Revoke() {}
+func Revoke(c *godaddy.Client, id string, body *CertificateRevoke) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Post("/v1/certificates/"+id+"/revoke", enc)
+
+	return err
+}
 
 // SiteSeal generates and retrieves the site seal
-func SiteSeal() {}
+func SiteSeal(c *godaddy.Client, id string, theme string, locale string) (*CertificateSiteSeal, error) {
+	res := new(CertificateSiteSeal)
+
+	data, err := c.Get("/v1/certificates/" + id + "/siteSeal")
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
 
 // VerifyDomainControl confirms domain control
-func VerifyDomainControl() {}
+func VerifyDomainControl(c *godaddy.Client, id string) error {
+	_, err := c.Post("/v1/certificates/"+id+"/verifyDomainControl", nil)
+
+	return err
+}
