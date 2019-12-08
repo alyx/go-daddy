@@ -25,11 +25,11 @@ type TicketCreate struct {
 	Type        string
 }
 
-type TicketId struct {
-	TicketId string
+type TicketID struct {
+	TicketID string
 }
 
 type TicketList struct {
 	Pagination godaddy.Pagination
-	TicketIds  []string
+	TicketIDs  []string
 }
