@@ -2,6 +2,9 @@ package domains
 
 import (
 	"encoding/json"
+	"net/url"
+	"strconv"
+	"strings"
 
 	"github.com/alyx/godaddy"
 )
@@ -56,7 +59,63 @@ func GetPurchaseSchema(tld string) { return }
 
 func ValidatePurchaseSchema() { return }
 
-func GetSuggestions() { return }
+// GetSuggestions suggests alternate Domain names based on a seed Domain,
+// a set of keywords, or the shopper's purchase history
+func GetSuggestions(c *godaddy.Client, query string, country string, city string,
+	sources []string, tlds []string, lengthMax int, lengthMin int, limit int,
+	waitMs int) ([]DomainSuggestion, error) {
+	var suggestions []DomainSuggestion
+	u, err := url.Parse("/v1/domains/suggest")
+	if err != nil {
+		return nil, err
+	}
+	q, err := url.ParseQuery(u.RawQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	if query != "" {
+		q.Add("query", query)
+	}
+	if country != "" {
+		q.Add("country", country)
+	}
+	if city != "" {
+		q.Add("city", city)
+	}
+	if len(sources) > 0 {
+		q.Add("sources", strings.Join(sources, ","))
+	}
+	if len(tlds) > 0 {
+		q.Add("tlds", strings.Join(tlds, ","))
+	}
+	if lengthMax > 0 {
+		q.Add("lengthMax", strconv.Itoa(lengthMax))
+	}
+	if lengthMin > 0 {
+		q.Add("lengthMin", strconv.Itoa(lengthMin))
+	}
+	if limit > 0 {
+		q.Add("limit", strconv.Itoa(limit))
+	}
+	if waitMs > 0 {
+		q.Add("waitMs", strconv.Itoa(waitMs))
+	}
+
+	u.RawQuery = q.Encode()
+
+	data, err := c.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(data, &suggestions)
+	if err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
 
 // GetTLDs retrieves a list of TLDs supported and enabled for sale
 func GetTLDs(c *godaddy.Client) ([]TldSummary, error) {

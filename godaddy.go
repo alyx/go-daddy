@@ -14,9 +14,10 @@ import (
 
 // Client is the core wrapper around the GoDaddy API client.
 type Client struct {
-	Key    string
-	Secret string
-	OTE    bool
+	Shopper string
+	Key     string
+	Secret  string
+	OTE     bool
 }
 
 // Error presents a generic error class
@@ -46,6 +47,14 @@ type ErrorLimit struct {
 	RetryAfterSec int
 }
 
+type Pagination struct {
+	First    string
+	Last     string
+	Next     string
+	Previous string
+	Total    int
+}
+
 // GetURL is a helper function returning the API base URL for all API calls.
 // If the GODADDY_API_URL is defined, this value will override the standard
 // options.
@@ -70,6 +79,10 @@ func (c *Client) Get(method string) ([]byte, error) {
 
 	req.Header.Add("Authorization", fmt.Sprintf("sso-key %s:%s", c.Key, c.Secret))
 	req.Header.Add("Content-Type", "application/json")
+
+	if c.Shopper != "" {
+		req.Header.Add("X-Shopper-Id", c.Shopper)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -107,6 +120,10 @@ func (c *Client) Post(method string, body []byte) ([]byte, error) {
 
 	req.Header.Add("Authorization", fmt.Sprintf("sso-key %s:%s", c.Key, c.Secret))
 	req.Header.Add("Content-Type", "application/json")
+
+	if c.Shopper != "" {
+		req.Header.Add("X-Shopper-Id", c.Shopper)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
