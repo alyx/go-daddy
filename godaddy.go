@@ -9,15 +9,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 )
 
 // Client is the core wrapper around the GoDaddy API client.
 type Client struct {
-	Shopper string
-	Key     string
-	Secret  string
-	OTE     bool
+	MarketID string
+	Shopper  string
+	Key      string
+	Secret   string
+	OTE      bool
 }
 
 // Error presents a generic error class
@@ -47,6 +49,15 @@ type ErrorLimit struct {
 	RetryAfterSec int
 }
 
+type Address struct {
+	Address1   string
+	Address2   string
+	City       string
+	Country    string
+	PostalCode string
+	State      string
+}
+
 type Pagination struct {
 	First    string
 	Last     string
@@ -67,6 +78,48 @@ func (c *Client) GetURL() string {
 	}
 
 	return "https://api.godaddy.com"
+}
+
+// GenericWithBody is handler for HTTP actions with potential body content
+func (c *Client) GenericWithBody(action string, method string, body []byte) ([]byte, error) {
+	client := new(http.Client)
+	req, err := http.NewRequest(action, c.GetURL()+method, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("sso-key %s:%s", c.Key, c.Secret))
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
+	if c.Shopper != "" {
+		req.Header.Add("X-Shopper-Id", c.Shopper)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode > 299 {
+		e := new(Error)
+
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return nil, err
+		}
+
+		return data, e
+	}
+
+	return data, nil
 }
 
 // Get processes core API integration via HTTP GET requests
@@ -96,7 +149,7 @@ func (c *Client) Get(method string) ([]byte, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode > 299 {
 		e := new(Error)
 
 		err = json.Unmarshal(data, &e)
@@ -112,43 +165,40 @@ func (c *Client) Get(method string) ([]byte, error) {
 
 // Post processes core API integration via HTTP POST requests
 func (c *Client) Post(method string, body []byte) ([]byte, error) {
-	client := new(http.Client)
-	req, err := http.NewRequest("POST", c.GetURL()+method, bytes.NewBuffer(body))
+	return c.GenericWithBody("POST", method, body)
+}
+
+// Delete processes core API integration via HTTP DELETE requests
+func (c *Client) Delete(method string, body []byte) ([]byte, error) {
+	return c.GenericWithBody("DELETE", method, body)
+}
+
+// Put processes core API integration via HTTP PUT requests
+func (c *Client) Put(method string, body []byte) ([]byte, error) {
+	return c.GenericWithBody("PUT", method, body)
+}
+
+// BuildQuery builds an HTTP query from a map of string:string components
+func BuildQuery(uri string, values map[string]string) (string, error) {
+	u, err := url.Parse(uri)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("sso-key %s:%s", c.Key, c.Secret))
-	req.Header.Add("Content-Type", "application/json")
-
-	if c.Shopper != "" {
-		req.Header.Add("X-Shopper-Id", c.Shopper)
-	}
-
-	resp, err := client.Do(req)
+	q, err := url.ParseQuery(u.RawQuery)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != 200 {
-		e := new(Error)
-
-		err = json.Unmarshal(data, &e)
-		if err != nil {
-			return nil, err
+	for key, value := range values {
+		if value != "" {
+			q.Add(key, value)
 		}
-
-		return data, e
 	}
 
-	return data, nil
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
 }
 
 func checkEnvOrGiveString(env string, value string) string {

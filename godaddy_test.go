@@ -71,3 +71,12 @@ func TestGetURL(t *testing.T) {
 	}
 	os.Unsetenv("GODADDY_API_URL")
 }
+
+func TestGenerateError(t *testing.T) {
+	e := new(Error)
+	e.Message = "Test"
+
+	if e.Error() != "Test" {
+		t.Errorf("Error failure, expected: %s, got: %s", "Test", e.Error())
+	}
+}

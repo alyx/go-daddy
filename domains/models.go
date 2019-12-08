@@ -2,15 +2,6 @@ package domains
 
 import "github.com/alyx/godaddy"
 
-type Address struct {
-	Address1   string
-	Address2   string
-	City       string
-	Country    string
-	PostalCode string
-	State      string
-}
-
 type Consent struct {
 	AgreedAt      string
 	AgreedBy      string
@@ -18,7 +9,7 @@ type Consent struct {
 }
 
 type Contact struct {
-	AddressMailing Address
+	AddressMailing godaddy.Address
 	Email          string
 	Fax            string
 	JobTitle       string
