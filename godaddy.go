@@ -15,11 +15,12 @@ import (
 
 // Client is the core wrapper around the GoDaddy API client.
 type Client struct {
-	MarketID string
-	Shopper  string
-	Key      string
-	Secret   string
-	OTE      bool
+	PrivateLabel string
+	Market       string
+	Shopper      string
+	Key          string
+	Secret       string
+	OTE          bool
 }
 
 // Error presents a generic error class
@@ -107,6 +108,12 @@ func (c *Client) GenericWithBody(action string, method string, body []byte) ([]b
 	if c.Shopper != "" {
 		req.Header.Add("X-Shopper-Id", c.Shopper)
 	}
+	if c.Market != "" {
+		req.Header.Add("X-Market-Id", c.Market)
+	}
+	if c.PrivateLabel != "" {
+		req.Header.Add("X-Private-Label-Id", c.PrivateLabel)
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -147,6 +154,12 @@ func (c *Client) Get(method string) ([]byte, error) {
 
 	if c.Shopper != "" {
 		req.Header.Add("X-Shopper-Id", c.Shopper)
+	}
+	if c.Market != "" {
+		req.Header.Add("X-Market-Id", c.Market)
+	}
+	if c.PrivateLabel != "" {
+		req.Header.Add("X-Private-Label-Id", c.PrivateLabel)
 	}
 
 	resp, err := client.Do(req)
