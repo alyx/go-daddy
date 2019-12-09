@@ -11,20 +11,33 @@ import (
 
 // List returns a list of DomainSummary objects for all domains owned
 // by the user.
-func List(c *godaddy.Client) ([]DomainSummary, error) {
-	var domains []DomainSummary
+func List(c *godaddy.Client, statuses []string, statusGroups []string, limit int,
+	marker string, includes []string, modifiedDate string) ([]DomainSummary, error) {
+	var res []DomainSummary
 
-	data, err := c.Get("/v1/domains")
+	uri, err := godaddy.BuildQuery("/v1/domains", map[string]interface{}{
+		"statuses":     statuses,
+		"statusGroups": statusGroups,
+		"limit":        limit,
+		"marker":       marker,
+		"includes":     includes,
+		"modifiedDate": modifiedDate,
+	})
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	err = json.Unmarshal(data, &domains)
+	data, err := c.Get(uri)
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
-	return domains, nil
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
 }
 
 func GetAgreements() { return }
