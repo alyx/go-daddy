@@ -8,18 +8,6 @@ type Consent struct {
 	AgreementKeys []string
 }
 
-type Contact struct {
-	AddressMailing godaddy.Address
-	Email          string
-	Fax            string
-	JobTitle       string
-	NameFirst      string
-	NameLast       string
-	NameMiddle     string
-	Organization   string
-	Phone          string
-}
-
 type DNSRecord struct {
 	Data     string
 	Name     string
@@ -55,10 +43,10 @@ type DomainAvailableBulkMixed struct {
 }
 
 type DomainContacts struct {
-	Admin      Contact
-	Billing    Contact
-	Registrant Contact
-	Tech       Contact
+	Admin      godaddy.Contact
+	Billing    godaddy.Contact
+	Registrant godaddy.Contact
+	Tech       godaddy.Contact
 }
 
 type DomainDetail struct {
@@ -148,7 +136,7 @@ type DomainUpdate struct {
 
 type DomainContactsBulk struct {
 	DomainContacts
-	ContactPresence Contact
+	ContactPresence godaddy.Contact
 	Domains         []string
 	EntityType      string
 }

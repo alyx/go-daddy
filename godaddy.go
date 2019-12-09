@@ -58,6 +58,18 @@ type Address struct {
 	State      string
 }
 
+type Contact struct {
+	AddressMailing Address
+	Email          string
+	Fax            string
+	JobTitle       string
+	NameFirst      string
+	NameLast       string
+	NameMiddle     string
+	Organization   string
+	Phone          string
+}
+
 type Pagination struct {
 	First    string
 	Last     string
