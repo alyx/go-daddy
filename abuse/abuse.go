@@ -2,12 +2,36 @@ package abuse
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/alyx/godaddy"
 )
 
-// Tickets lists all abuse tickets ids that match user provided filters
-func Tickets() {
+// ListTickets lists all abuse tickets ids that match user provided filters
+func ListTickets(c *godaddy.Client, ticketType string, closed bool, sourceDomainOrIP string,
+	target string, createdStart string, createdEnd string, limit int,
+	offset int) (*TicketList, error) {
+	res := new(TicketList)
+
+	uri, err := godaddy.BuildQuery("/v1/abuse/tickets", map[string]string{
+		"type":             ticketType,
+		"closed":           strconv.FormatBool(closed),
+		"sourceDomainOrIp": sourceDomainOrIP,
+		"target":           target,
+		"createdStart":     createdStart,
+		"createdEnd":       createdEnd,
+		"limit":            strconv.Itoa(limit),
+		"offset":           strconv.Itoa(offset),
+	})
+
+	data, err := c.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
 }
 
 // NewTicket creates a new abuse ticket
