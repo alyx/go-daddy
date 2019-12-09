@@ -2,11 +2,9 @@ package domains
 
 import (
 	"encoding/json"
-	"net/url"
-	"strconv"
-	"strings"
 
 	"github.com/alyx/godaddy"
+	"github.com/alyx/godaddy/agreements"
 )
 
 // List returns a list of DomainSummary objects for all domains owned
@@ -40,9 +38,57 @@ func List(c *godaddy.Client, statuses []string, statusGroups []string, limit int
 	return res, nil
 }
 
-func GetAgreements() { return }
+// GetAgreements retrieves the legal agreement(s) required to purchase the specified TLD and add-ons
+func GetAgreements(c *godaddy.Client, tlds []string, privacy bool, forTransfer bool) ([]agreements.LegalAgreement, error) {
+	var res []agreements.LegalAgreement
 
-func GetAvailable() { return }
+	uri, err := godaddy.BuildQuery("/v1/domains/agreements", map[string]interface{}{
+		"tlds":        tlds,
+		"privacy":     privacy,
+		"forTransfer": forTransfer,
+	})
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
+}
+
+// GetAvailable determines whether or not the specified domain is available for purchase
+func GetAvailable(c *godaddy.Client, domain string, checkType string, forTransfer bool) (*DomainAvailableResponse, error) {
+	res := new(DomainAvailableResponse)
+
+	uri, err := godaddy.BuildQuery("/v1/domains/available", map[string]interface{}{
+		"domain":      domain,
+		"checkType":   checkType,
+		"forTransfer": forTransfer,
+	})
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
+}
 
 // GetAvailableBulk determine whether or not the specified domains are
 // available for purchase
@@ -67,7 +113,28 @@ func GetAvailableBulk(c *godaddy.Client, domains []string) (*DomainAvailableBulk
 	return res, nil
 }
 
-func ValidateContactSchema()       { return }
+// ValidateContactSchema validates the request body using the Domain Contact Validation Schema for specified domains.
+func ValidateContactSchema(c *godaddy.Client, marketID string, body *DomainContactsBulk) (bool, error) {
+	uri, err := godaddy.BuildQuery("/v1/domains/contacts/validate", map[string]interface{}{
+		"marketId": marketID,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = c.Post(uri, enc)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func GetPurchaseSchema(tld string) { return }
 
 func ValidatePurchaseSchema() { return }
@@ -78,46 +145,23 @@ func GetSuggestions(c *godaddy.Client, query string, country string, city string
 	sources []string, tlds []string, lengthMax int, lengthMin int, limit int,
 	waitMs int) ([]DomainSuggestion, error) {
 	var suggestions []DomainSuggestion
-	u, err := url.Parse("/v1/domains/suggest")
+
+	uri, err := godaddy.BuildQuery("/v1/domains/suggest", map[string]interface{}{
+		"query":     query,
+		"country":   country,
+		"city":      city,
+		"sources":   sources,
+		"tlds":      tlds,
+		"lengthMax": lengthMax,
+		"lengthMin": lengthMin,
+		"limit":     limit,
+		"waitMs":    waitMs,
+	})
 	if err != nil {
 		return nil, err
 	}
-	q, err := url.ParseQuery(u.RawQuery)
-	if err != nil {
-		return nil, err
-	}
 
-	if query != "" {
-		q.Add("query", query)
-	}
-	if country != "" {
-		q.Add("country", country)
-	}
-	if city != "" {
-		q.Add("city", city)
-	}
-	if len(sources) > 0 {
-		q.Add("sources", strings.Join(sources, ","))
-	}
-	if len(tlds) > 0 {
-		q.Add("tlds", strings.Join(tlds, ","))
-	}
-	if lengthMax > 0 {
-		q.Add("lengthMax", strconv.Itoa(lengthMax))
-	}
-	if lengthMin > 0 {
-		q.Add("lengthMin", strconv.Itoa(lengthMin))
-	}
-	if limit > 0 {
-		q.Add("limit", strconv.Itoa(limit))
-	}
-	if waitMs > 0 {
-		q.Add("waitMs", strconv.Itoa(waitMs))
-	}
-
-	u.RawQuery = q.Encode()
-
-	data, err := c.Get(u.String())
+	data, err := c.Get(uri)
 	if err != nil {
 		return nil, err
 	}
