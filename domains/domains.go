@@ -191,11 +191,45 @@ func GetTLDs(c *godaddy.Client) ([]TldSummary, error) {
 	return tlds, nil
 }
 
-// Individual domain settings
+// Purchase and register the specified Domain
+func Purchase(c *godaddy.Client, body *DomainPurchase) (*DomainPurchaseResponse, error) {
+	res := new(DomainPurchaseResponse)
 
-func Purchase()       { return }
-func Delete()         { return }
-func Get()            { return }
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Post("/v1/domains/purchase", enc)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// Delete cancels a purchased domain
+func Delete(c *godaddy.Client, domain string) error {
+	_, err := c.Delete("/v1/domains/"+domain, nil)
+
+	return err
+}
+
+// Get retrieves details for the specified Domain
+func Get(c *godaddy.Client, domain string) (*DomainDetail, error) {
+	res := new(DomainDetail)
+
+	data, err := c.Get("/v1/domains/" + domain)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
 func Update()         { return }
 func UpdateContacts() { return }
 

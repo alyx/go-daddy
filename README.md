@@ -58,8 +58,7 @@ The available packages for import are:
 ### Example
 
 This is a basic example showing how to generate a self-serve client and
-retrieve a list of all domains owned by the account. Additional examples may
-be found in the `examples/` folder.
+retrieve a list of all domains owned by the account.
 
 ```go
 package main
@@ -84,3 +83,7 @@ func main() {
 	}
 }
 ```
+
+## License
+
+This package is licensed under the ISC license, see `LICENSE`
