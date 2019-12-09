@@ -134,7 +134,7 @@ func GetCallback(c *godaddy.Client, id string) (*Callback, error) {
 // AddCallback registers a certificate action callback
 func AddCallback(c *godaddy.Client, id string, cb string) error {
 	uri, err := godaddy.BuildQuery("/v1/certificates/"+id+"/callback",
-		map[string]string{"callbackUrl": cb})
+		map[string]interface{}{"callbackUrl": cb})
 	if err != nil {
 		return err
 	}

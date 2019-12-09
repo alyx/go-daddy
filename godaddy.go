@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
+	"strings"
 )
 
 // Client is the core wrapper around the GoDaddy API client.
@@ -204,7 +206,7 @@ func (c *Client) Put(method string, body []byte) ([]byte, error) {
 }
 
 // BuildQuery builds an HTTP query from a map of string:string components
-func BuildQuery(uri string, values map[string]string) (string, error) {
+func BuildQuery(uri string, values map[string]interface{}) (string, error) {
 	u, err := url.Parse(uri)
 	if err != nil {
 		return "", err
@@ -216,8 +218,21 @@ func BuildQuery(uri string, values map[string]string) (string, error) {
 	}
 
 	for key, value := range values {
-		if value != "" {
-			q.Add(key, value)
+		switch v := value.(type) {
+		case int:
+			if v > 0 {
+				q.Add(key, strconv.Itoa(v))
+			}
+		case string:
+			if v != "" {
+				q.Add(key, v)
+			}
+		case []string:
+			if len(v) > 0 {
+				q.Add(key, strings.Join(v, ","))
+			}
+		case bool:
+			q.Add(key, strconv.FormatBool(v))
 		}
 	}
 

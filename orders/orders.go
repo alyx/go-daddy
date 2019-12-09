@@ -2,7 +2,6 @@ package orders
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"github.com/alyx/godaddy"
 )
@@ -12,15 +11,15 @@ func List(c *godaddy.Client, periodStart string, periodEnd string, domain string
 	productGroupID int, paymentProfileID int, parentOrderID string, offset int,
 	limit int, sort string) (*OrderList, error) {
 	res := new(OrderList)
-	uri, err := godaddy.BuildQuery("/v1/orders", map[string]string{
+	uri, err := godaddy.BuildQuery("/v1/orders", map[string]interface{}{
 		"periodStart":      periodStart,
 		"periodEnd":        periodEnd,
 		"domain":           domain,
-		"productGroupId":   strconv.Itoa(productGroupID),
-		"paymentProfileId": strconv.Itoa(paymentProfileID),
+		"productGroupId":   productGroupID,
+		"paymentProfileId": paymentProfileID,
 		"parentOrderId":    parentOrderID,
-		"offset":           strconv.Itoa(offset),
-		"limit":            strconv.Itoa(limit),
+		"offset":           offset,
+		"limit":            limit,
 		"sort":             sort,
 	})
 	if err != nil {

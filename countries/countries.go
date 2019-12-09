@@ -2,7 +2,6 @@ package countries
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"github.com/alyx/godaddy"
 )
@@ -11,9 +10,9 @@ import (
 // filters.
 func Get(c *godaddy.Client, marketID string, regionTypeID int, regionName string, sort string, order string) ([]CountrySummary, error) {
 	var res []CountrySummary
-	uri, err := godaddy.BuildQuery("/v1/countries", map[string]string{
+	uri, err := godaddy.BuildQuery("/v1/countries", map[string]interface{}{
 		"marketId":     marketID,
-		"regionTypeId": strconv.Itoa(regionTypeID),
+		"regionTypeId": regionTypeID,
 		"regionName":   regionName,
 		"sort":         sort,
 		"order":        order,
@@ -36,7 +35,7 @@ func Get(c *godaddy.Client, marketID string, regionTypeID int, regionName string
 // countryKey
 func GetByKey(c *godaddy.Client, countryKey string, marketID string, sort string, order string) ([]Country, error) {
 	var res []Country
-	uri, err := godaddy.BuildQuery("/v1/countries/"+countryKey, map[string]string{
+	uri, err := godaddy.BuildQuery("/v1/countries/"+countryKey, map[string]interface{}{
 		"marketId": marketID,
 		"sort":     sort,
 		"order":    order,

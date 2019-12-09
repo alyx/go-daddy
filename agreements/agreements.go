@@ -2,7 +2,6 @@ package agreements
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/alyx/godaddy"
 )
@@ -11,14 +10,14 @@ import (
 func Get(c *godaddy.Client, keys []string) ([]LegalAgreement, error) {
 	var res []LegalAgreement
 
-	uri, err := godaddy.BuildQuery("/v1/agreements", map[string]string{
-		"keys": strings.Join(keys, ","),
+	uri, err := godaddy.BuildQuery("/v1/agreements", map[string]interface{}{
+		"keys": keys,
 	})
 	if err != nil {
 		return res, err
 	}
 
-	data, err := godaddy.Get(uri)
+	data, err := c.Get(uri)
 	if err != nil {
 		return res, err
 	}

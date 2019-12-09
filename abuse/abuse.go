@@ -2,7 +2,6 @@ package abuse
 
 import (
 	"encoding/json"
-	"strconv"
 
 	"github.com/alyx/godaddy"
 )
@@ -13,15 +12,15 @@ func ListTickets(c *godaddy.Client, ticketType string, closed bool, sourceDomain
 	offset int) (*TicketList, error) {
 	res := new(TicketList)
 
-	uri, err := godaddy.BuildQuery("/v1/abuse/tickets", map[string]string{
+	uri, err := godaddy.BuildQuery("/v1/abuse/tickets", map[string]interface{}{
 		"type":             ticketType,
-		"closed":           strconv.FormatBool(closed),
+		"closed":           closed,
 		"sourceDomainOrIp": sourceDomainOrIP,
 		"target":           target,
 		"createdStart":     createdStart,
 		"createdEnd":       createdEnd,
-		"limit":            strconv.Itoa(limit),
-		"offset":           strconv.Itoa(offset),
+		"limit":            limit,
+		"offset":           offset,
 	})
 
 	data, err := c.Get(uri)
