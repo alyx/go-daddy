@@ -190,6 +190,11 @@ func (c *Client) Put(method string, body []byte) ([]byte, error) {
 	return c.GenericWithBody("PUT", method, body)
 }
 
+// Patch processes core API integration via HTTP POST requests
+func (c *Client) Patch(method string, body []byte) ([]byte, error) {
+	return c.GenericWithBody("PATCH", method, body)
+}
+
 // BuildQuery builds an HTTP query from a map of string:string components
 func BuildQuery(uri string, values map[string]interface{}) (string, error) {
 	u, err := url.Parse(uri)

@@ -230,25 +230,190 @@ func Get(c *godaddy.Client, domain string) (*DomainDetail, error) {
 
 	return res, err
 }
-func Update()         { return }
-func UpdateContacts() { return }
 
-// Privacy
-func DeletePrivacy()   { return }
-func PurchasePrivacy() { return }
+// Update details for the specified Domain
+func Update(c *godaddy.Client, domain string, body *DomainUpdate) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
 
-func AddRecords()                  { return }
-func ReplaceRecords()              { return }
-func ReplaceRecordsByType()        { return }
-func ReplaceRecordsByTypeAndName() { return }
-func GetRecords()                  { return }
+	_, err = c.Patch("/v1/domains/"+domain, enc)
 
-func Renew()               { return }
-func Transfer()            { return }
-func SendRegistrantEmail() { return }
+	return err
+}
+
+// UpdateContacts updates contacts for the specified Domain
+func UpdateContacts(c *godaddy.Client, domain string, body *DomainContacts) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Patch("/v1/domains/"+domain+"/contacts", enc)
+
+	return err
+}
+
+// DeletePrivacy submits a privacy cancellation request for the given Domain
+func DeletePrivacy(c *godaddy.Client, domain string) error {
+	_, err := c.Delete("/v1/domains/"+domain+"/privacy", nil)
+
+	return err
+}
+
+// PurchasePrivacy purchases privacy for a specified Domain
+func PurchasePrivacy(c *godaddy.Client, domain string, body *PrivacyPurchase) (*DomainPurchaseResponse, error) {
+	res := new(DomainPurchaseResponse)
+
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Post("/v1/domains/"+domain+"/privacy/purchase", enc)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// AddRecords adds the specified DNS Records to the specified Domain
+func AddRecords(c *godaddy.Client, domain string, body []DNSRecord) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Patch("/v1/domains/"+domain+"/records", enc)
+
+	return err
+}
+
+// ReplaceRecords replaces all DNS Records for the specified Domain
+func ReplaceRecords(c *godaddy.Client, domain string, body []DNSRecord) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Put("/v1/domains/"+domain+"/records", enc)
+
+	return err
+}
+
+// ReplaceRecordsByType replaces all DNS Records for the specified Domain with
+// the specified Type
+func ReplaceRecordsByType(c *godaddy.Client, domain string, dnstype string, body []DNSRecord) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Put("/v1/domains/"+domain+"/records/"+dnstype, enc)
+
+	return err
+}
+
+// ReplaceRecordsByTypeAndName replaces all DNS Records for the specified
+// Domain with the specified Type and Name
+func ReplaceRecordsByTypeAndName(c *godaddy.Client, domain string, dnstype string, name string, body []DNSRecord) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Put("/v1/domains/"+domain+"/records/"+dnstype+"/"+name, enc)
+
+	return err
+}
+
+func GetRecords() { return }
+
+// Renew purchases a renewal for the specified Domain
+func Renew(c *godaddy.Client, domain string, body *DomainRenew) (*DomainPurchaseResponse, error) {
+	res := new(DomainPurchaseResponse)
+
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Post("/v1/domains/"+domain+"/renew", enc)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// Transfer purchases and starts or restarts a transfer process
+func Transfer(c *godaddy.Client, domain string, body *DomainTransferIn) (*DomainPurchaseResponse, error) {
+	res := new(DomainPurchaseResponse)
+
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Post("/v1/domains/"+domain+"/transfer", enc)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// SendRegistrantEmail re-sends Contact E-Mail Verification for specified Domain
+func SendRegistrantEmail(c *godaddy.Client, domain string) error {
+	_, err := c.Post("/v1/domains/"+domain+"/verifyRegistrantEmail", nil)
+
+	return err
+}
 
 // v2
 
-func RemoveForward() { return }
-func GetForward()    { return }
-func UpdateForward() { return }
+// RemoveForward submits a forwarding cancellation request for the given fqdn
+func RemoveForward(c *godaddy.Client, customer string, fqdn string) error {
+	_, err := c.Delete("/v2/customers/"+customer+"/domains/forwards/"+fqdn, nil)
+
+	return err
+}
+
+// GetForward retrieves the forwarding information for the given fqdn
+func GetForward(c *godaddy.Client, customer string, fqdn string, subdomains bool) ([]DomainForwarding, error) {
+	var res []DomainForwarding
+	uri, err := godaddy.BuildQuery("/v2/customers/"+customer+"/domains/forwards/"+fqdn,
+		map[string]interface{}{"includeSubs": subdomains})
+	if err != nil {
+		return res, err
+	}
+
+	data, err := c.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// UpdateForward modifies the forwarding information for the given fqdn
+func UpdateForward(c *godaddy.Client, customer string, fqdn string, body *DomainForwardingCreate) error {
+	enc, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.Put("/v2/customers/"+customer+"/domains/forwards/"+fqdn, enc)
+
+	return err
+}
