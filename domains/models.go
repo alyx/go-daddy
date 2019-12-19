@@ -1,6 +1,8 @@
 package domains
 
-import "github.com/alyx/godaddy"
+import (
+	godaddy "github.com/alyx/go-daddy"
+)
 
 type Consent struct {
 	AgreedAt      string
@@ -151,13 +153,6 @@ type ErrorDomainContactsValidate struct {
 type ErrorFieldDomainContactsValidate struct {
 	godaddy.ErrorField
 	Domains []string
-}
-
-type LegalAgreement struct {
-	AgreementKey string
-	Content      string
-	Title        string
-	URL          string
 }
 
 type PrivacyPurchase struct {

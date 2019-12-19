@@ -1,7 +1,7 @@
 package orders
 
 import (
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 type BillTo struct {

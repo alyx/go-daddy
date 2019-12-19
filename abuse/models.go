@@ -1,6 +1,6 @@
 package abuse
 
-import "github.com/alyx/godaddy"
+import godaddy "github.com/alyx/go-daddy"
 
 // Ticket defines the content of a ticket generated from GetTicket()
 type Ticket struct {

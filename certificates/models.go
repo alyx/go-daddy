@@ -1,7 +1,7 @@
 package certificates
 
 import (
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 type Certificate struct {

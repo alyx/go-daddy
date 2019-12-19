@@ -1,4 +1,4 @@
-package godaddy
+package daddy
 
 // SPDX-License-Identifier: ISC
 
@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -22,7 +21,7 @@ type Client struct {
 	Shopper      string
 	Key          string
 	Secret       string
-	OTE          bool
+	url          string
 }
 
 // Error presents a generic error class
@@ -81,24 +80,10 @@ type Pagination struct {
 	Total    int
 }
 
-// GetURL is a helper function returning the API base URL for all API calls.
-// If the GODADDY_API_URL is defined, this value will override the standard
-// options.
-func (c *Client) GetURL() string {
-	e := os.Getenv("GODADDY_API_URL")
-	if e != "" {
-		return e
-	} else if c.OTE {
-		return "https://api.ote-godaddy.com"
-	}
-
-	return "https://api.godaddy.com"
-}
-
 // GenericWithBody is handler for HTTP actions with potential body content
 func (c *Client) GenericWithBody(action string, method string, body []byte) ([]byte, error) {
 	client := new(http.Client)
-	req, err := http.NewRequest(action, c.GetURL()+method, bytes.NewBuffer(body))
+	req, err := http.NewRequest(action, c.url+method, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +131,7 @@ func (c *Client) GenericWithBody(action string, method string, body []byte) ([]b
 // Get processes core API integration via HTTP GET requests
 func (c *Client) Get(method string) ([]byte, error) {
 	client := new(http.Client)
-	req, err := http.NewRequest("GET", c.GetURL()+method, nil)
+	req, err := http.NewRequest("GET", c.url+method, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -241,15 +226,6 @@ func BuildQuery(uri string, values map[string]interface{}) (string, error) {
 	return u.String(), nil
 }
 
-func checkEnvOrGiveString(env string, value string) string {
-	v := os.Getenv(env)
-	if v == "" {
-		return value
-	}
-
-	return v
-}
-
 // NewClient accepts three inputs:
 // - key is a string containing your GoDaddy API key. If this value is empty,
 //   NewClient will attempt to find GODADDY_API_KEY in your environmental
@@ -266,19 +242,33 @@ func checkEnvOrGiveString(env string, value string) string {
 //
 //XXX: Update for preferring environment.
 func NewClient(key string, secret string, ote bool) (*Client, error) {
+	if ote {
+		return NewClientWithURL(key, secret, "https://api.ote-godaddy.com")
+	} else {
+		return NewClientWithURL(key, secret, "https://api.godaddy.com")
+	}
+}
+
+func NewClientWithURL(key string, secret string, url string) (*Client, error) {
 	client := new(Client)
 
-	client.Key = checkEnvOrGiveString("GODADDY_API_KEY", key)
-	if client.Key == "" {
+	if key == "" {
 		return nil, errors.New("Missing GoDaddy API key")
+	} else {
+		client.Key = key
 	}
 
-	client.Secret = checkEnvOrGiveString("GODADDY_API_SECRET", secret)
-	if client.Secret == "" {
-		return nil, errors.New("Missing GoDaddy API secret key")
+	if secret == "" {
+		return nil, errors.New("Missing GoDaddy API secret")
+	} else {
+		client.Secret = secret
 	}
 
-	client.OTE = ote
+	if url == "" {
+		return nil, errors.New("Missing API endpoint")
+	} else {
+		client.url = url
+	}
 
 	return client, nil
 }

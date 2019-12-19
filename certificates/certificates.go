@@ -3,7 +3,7 @@ package certificates
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // Create will create a pending order for a certificate

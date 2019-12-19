@@ -3,7 +3,7 @@ package countries
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // Get retrieves summary country information for the provided marketID and

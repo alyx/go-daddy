@@ -3,7 +3,7 @@ package orders
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // List retrieves a list of orders for the authenticated shopper.

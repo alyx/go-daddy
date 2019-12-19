@@ -3,7 +3,7 @@ package aftermarket
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // DeleteListings removes listings from GoDaddy Auction

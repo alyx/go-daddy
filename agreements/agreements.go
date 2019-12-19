@@ -3,7 +3,7 @@ package agreements
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // Get retrieves Legal Agreements for provided agreements keys

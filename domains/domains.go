@@ -3,8 +3,8 @@ package domains
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
-	"github.com/alyx/godaddy/agreements"
+	godaddy "github.com/alyx/go-daddy"
+	"github.com/alyx/go-daddy/agreements"
 )
 
 // List returns a list of DomainSummary objects for all domains owned

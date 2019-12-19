@@ -3,7 +3,7 @@ package abuse
 import (
 	"encoding/json"
 
-	"github.com/alyx/godaddy"
+	godaddy "github.com/alyx/go-daddy"
 )
 
 // ListTickets lists all abuse tickets ids that match user provided filters
