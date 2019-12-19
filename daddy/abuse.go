@@ -1,18 +1,23 @@
-package abuse
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
 )
 
-// ListTickets lists all abuse tickets ids that match user provided filters
-func ListTickets(c *godaddy.Client, ticketType string, closed bool, sourceDomainOrIP string,
-	target string, createdStart string, createdEnd string, limit int,
-	offset int) (*TicketList, error) {
-	res := new(TicketList)
+type AbuseService service
 
-	uri, err := godaddy.BuildQuery("/v1/abuse/tickets", map[string]interface{}{
+// ListTickets lists all abuse tickets ids that match user provided filters
+func (s *AbuseService) ListTickets(ticketType string, closed bool, sourceDomainOrIP string,
+	target string, createdStart string, createdEnd string, limit int,
+	offset int) (*AbuseTicketList, error) {
+	res := new(AbuseTicketList)
+
+	uri, err := BuildQuery("/v1/abuse/tickets", map[string]interface{}{
 		"type":             ticketType,
 		"closed":           closed,
 		"sourceDomainOrIp": sourceDomainOrIP,
@@ -23,7 +28,7 @@ func ListTickets(c *godaddy.Client, ticketType string, closed bool, sourceDomain
 		"offset":           offset,
 	})
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -34,11 +39,11 @@ func ListTickets(c *godaddy.Client, ticketType string, closed bool, sourceDomain
 }
 
 // NewTicket creates a new abuse ticket
-func NewTicket(c *godaddy.Client, ticket *TicketCreate) (*TicketID, error) {
-	var id = new(TicketID)
+func (s *AbuseService) NewTicket(ticket *AbuseTicketCreate) (*AbuseTicketID, error) {
+	var id = new(AbuseTicketID)
 
 	enc, err := json.Marshal(ticket)
-	data, err := c.Post("/v1/abuse/tickets", enc)
+	data, err := s.client.Post("/v1/abuse/tickets", enc)
 	if err != nil {
 		return id, err
 	}
@@ -49,10 +54,10 @@ func NewTicket(c *godaddy.Client, ticket *TicketCreate) (*TicketID, error) {
 }
 
 // GetTicket returns the abuse ticket data for a given ticket id
-func GetTicket(c *godaddy.Client, ticketID string) (*Ticket, error) {
-	var id = new(Ticket)
+func (s *AbuseService) GetTicket(ticketID string) (*AbuseTicket, error) {
+	var id = new(AbuseTicket)
 
-	data, err := c.Get("/v1/abuse/tickets/" + ticketID)
+	data, err := s.client.Get("/v1/abuse/tickets/" + ticketID)
 	if err != nil {
 		return id, err
 	}

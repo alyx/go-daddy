@@ -1,13 +1,18 @@
-package shoppers
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
 )
 
+type ShoppersService service
+
 // Create a Subaccount owned by the authenticated Reseller
-func Create(c *godaddy.Client, body *SubaccountCreate) (*ShopperID, error) {
+func (s *ShoppersService) Create(body *SubaccountCreate) (*ShopperID, error) {
 	res := new(ShopperID)
 
 	enc, err := json.Marshal(body)
@@ -15,7 +20,7 @@ func Create(c *godaddy.Client, body *SubaccountCreate) (*ShopperID, error) {
 		return res, err
 	}
 
-	data, err := c.Post("/v1/shoppers/subaccount", enc)
+	data, err := s.client.Post("/v1/shoppers/subaccount", enc)
 	if err != nil {
 		return res, err
 	}
@@ -26,17 +31,17 @@ func Create(c *godaddy.Client, body *SubaccountCreate) (*ShopperID, error) {
 }
 
 // Get details for the specified Shopper
-func Get(c *godaddy.Client, shopper string, includes []string) (*Shopper, error) {
+func (s *ShoppersService) Get(shopper string, includes []string) (*Shopper, error) {
 	res := new(Shopper)
 
-	uri, err := godaddy.BuildQuery("/v1/shoppers/"+shopper, map[string]interface{}{
+	uri, err := BuildQuery("/v1/shoppers/"+shopper, map[string]interface{}{
 		"includes": includes,
 	})
 	if err != nil {
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -50,7 +55,7 @@ func Get(c *godaddy.Client, shopper string, includes []string) (*Shopper, error)
 }
 
 // Update details for the specified Shopper
-func Update(c *godaddy.Client, shopper string, body *ShopperUpdate) (*ShopperID, error) {
+func (s *ShoppersService) Update(shopper string, body *ShopperUpdate) (*ShopperID, error) {
 	res := new(ShopperID)
 
 	enc, err := json.Marshal(body)
@@ -58,7 +63,7 @@ func Update(c *godaddy.Client, shopper string, body *ShopperUpdate) (*ShopperID,
 		return res, err
 	}
 
-	data, err := c.Post("/v1/shoppers/"+shopper, enc)
+	data, err := s.client.Post("/v1/shoppers/"+shopper, enc)
 	if err != nil {
 		return res, err
 	}
@@ -69,28 +74,28 @@ func Update(c *godaddy.Client, shopper string, body *ShopperUpdate) (*ShopperID,
 }
 
 // Delete sends a request for deletion of a Shopper profile
-func Delete(c *godaddy.Client, shopper string, auditClientIP string) error {
-	uri, err := godaddy.BuildQuery("/v1/shoppers/"+shopper, map[string]interface{}{
+func (s *ShoppersService) Delete(shopper string, auditClientIP string) error {
+	uri, err := BuildQuery("/v1/shoppers/"+shopper, map[string]interface{}{
 		"auditClientIp": auditClientIP,
 	})
 
-	_, err = c.Delete(uri, nil)
+	_, err = s.client.Delete(uri, nil)
 
 	return err
 }
 
 // Status retrieves details on the specified Shopper
-func Status(c *godaddy.Client, shopper string, auditClientIP string) (*ShopperStatus, error) {
+func (s *ShoppersService) Status(shopper string, auditClientIP string) (*ShopperStatus, error) {
 	res := new(ShopperStatus)
 
-	uri, err := godaddy.BuildQuery("/v1/shoppers/"+shopper+"/status", map[string]interface{}{
+	uri, err := BuildQuery("/v1/shoppers/"+shopper+"/status", map[string]interface{}{
 		"auditClientIp": auditClientIP,
 	})
 	if err != nil {
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -104,7 +109,7 @@ func Status(c *godaddy.Client, shopper string, auditClientIP string) (*ShopperSt
 }
 
 // SetPassword sets password for a Subaccount
-func SetPassword(c *godaddy.Client, shopper string, body *Secret) (*ShopperID, error) {
+func (s *ShoppersService) SetPassword(shopper string, body *Secret) (*ShopperID, error) {
 	res := new(ShopperID)
 
 	enc, err := json.Marshal(body)
@@ -112,7 +117,7 @@ func SetPassword(c *godaddy.Client, shopper string, body *Secret) (*ShopperID, e
 		return res, err
 	}
 
-	data, err := c.Put("/v1/shoppers/"+shopper+"/factors/password", enc)
+	data, err := s.client.Put("/v1/shoppers/"+shopper+"/factors/password", enc)
 	if err != nil {
 		return res, err
 	}

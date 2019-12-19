@@ -1,9 +1,12 @@
-package abuse
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
 
-import godaddy "github.com/alyx/go-daddy"
+package daddy
 
 // Ticket defines the content of a ticket generated from GetTicket()
-type Ticket struct {
+type AbuseTicket struct {
 	Closed    bool
 	ClosedAt  string
 	CreatedAt string
@@ -15,9 +18,9 @@ type Ticket struct {
 	Type      string
 }
 
-type TicketCreate struct {
+type AbuseTicketCreate struct {
 	Info        string
-	InfoUrl     string
+	InfoURL     string
 	Intentional bool
 	Proxy       string
 	Source      string
@@ -25,11 +28,11 @@ type TicketCreate struct {
 	Type        string
 }
 
-type TicketID struct {
+type AbuseTicketID struct {
 	TicketID string
 }
 
-type TicketList struct {
-	Pagination godaddy.Pagination
+type AbuseTicketList struct {
+	Pagination Pagination
 	TicketIDs  []string
 }

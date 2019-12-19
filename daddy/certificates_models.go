@@ -1,8 +1,9 @@
-package certificates
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
 
-import (
-	godaddy "github.com/alyx/go-daddy"
-)
+package daddy
 
 type Certificate struct {
 	CertificateID           string
@@ -10,7 +11,7 @@ type Certificate struct {
 	Contact                 Contact
 	CreatedAt               string
 	DeniedReason            string
-	Organization            Organization
+	Organization            CertificateOrganization
 	Period                  int
 	ProductType             string
 	Progress                int
@@ -25,21 +26,21 @@ type Certificate struct {
 	ValidStart              string
 }
 
-type Action struct {
+type CertificateAction struct {
 	CreatedAt string
 	Type      string
 }
 
-type Bundle struct {
+type CertificateBundle struct {
 	PEMs         PEMCertificates
 	SerialNumber string
 }
 
-type Callback struct {
+type CertificateCallback struct {
 	CallbackURL string
 }
 
-type Contact struct {
+type CertificateContact struct {
 	Email      string
 	JobTitle   string
 	NameFirst  string
@@ -55,7 +56,7 @@ type CertificateCreate struct {
 	Contact                 Contact
 	CSR                     string
 	IntelVPro               bool
-	Organization            OrganizationCreate
+	Organization            CertificateOrganizationCreate
 	Period                  int
 	ProductType             string
 	RootType                string
@@ -63,17 +64,17 @@ type CertificateCreate struct {
 	SubjectAlternativeNames []string
 }
 
-type Identifier struct {
+type CertificateIdentifier struct {
 	CertificateID string
 }
 
-type Organization struct {
-	OrganizationCreate
+type CertificateOrganization struct {
+	CertificateOrganizationCreate
 	JurisdictionOfIncorporation JurisdictionOfIncorporation
 }
 
-type OrganizationCreate struct {
-	Address            godaddy.Address
+type CertificateOrganizationCreate struct {
+	Address            Address
 	AssumedName        string
 	Name               string
 	Phone              string

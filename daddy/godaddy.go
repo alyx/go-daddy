@@ -17,76 +17,14 @@ import (
 	"strings"
 )
 
-// Client is the core wrapper around the GoDaddy API client.
-type Client struct {
-	PrivateLabel string
-	Market       string
-	Shopper      string
-	Key          string
-	Secret       string
-	url          string
-}
-
-// Error presents a generic error class
-type Error struct {
-	Code    string
-	Fields  []ErrorField
-	Message string
-}
-
 func (e *Error) Error() string {
 	return e.Message
-}
-
-// ErrorField components are used to specify precise errors from an Error
-type ErrorField struct {
-	Code        string
-	Message     string
-	Path        string
-	PathRelated string
-}
-
-// ErrorLimit is presented specifically when errors occur due to rate limiting
-type ErrorLimit struct {
-	Code          string
-	Fields        []ErrorField
-	Message       string
-	RetryAfterSec int
-}
-
-type Address struct {
-	Address1   string
-	Address2   string
-	City       string
-	Country    string
-	PostalCode string
-	State      string
-}
-
-type Contact struct {
-	AddressMailing Address
-	Email          string
-	Fax            string
-	JobTitle       string
-	NameFirst      string
-	NameLast       string
-	NameMiddle     string
-	Organization   string
-	Phone          string
-}
-
-type Pagination struct {
-	First    string
-	Last     string
-	Next     string
-	Previous string
-	Total    int
 }
 
 // GenericWithBody is handler for HTTP actions with potential body content
 func (c *Client) GenericWithBody(action string, method string, body []byte) ([]byte, error) {
 	client := new(http.Client)
-	req, err := http.NewRequest(action, c.url+method, bytes.NewBuffer(body))
+	req, err := http.NewRequest(action, c.BaseURL+method, bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +72,7 @@ func (c *Client) GenericWithBody(action string, method string, body []byte) ([]b
 // Get processes core API integration via HTTP GET requests
 func (c *Client) Get(method string) ([]byte, error) {
 	client := new(http.Client)
-	req, err := http.NewRequest("GET", c.url+method, nil)
+	req, err := http.NewRequest("GET", c.BaseURL+method, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -258,25 +196,36 @@ func NewClient(key string, secret string, ote bool) (*Client, error) {
 }
 
 func NewClientWithURL(key string, secret string, url string) (*Client, error) {
-	client := new(Client)
+	c := new(Client)
 
 	if key == "" {
 		return nil, errors.New("Missing GoDaddy API key")
 	} else {
-		client.Key = key
+		c.Key = key
 	}
 
 	if secret == "" {
 		return nil, errors.New("Missing GoDaddy API secret")
 	} else {
-		client.Secret = secret
+		c.Secret = secret
 	}
 
 	if url == "" {
 		return nil, errors.New("Missing API endpoint")
 	} else {
-		client.url = url
+		c.BaseURL = url
 	}
 
-	return client, nil
+	c.common.client = c
+	c.Abuse = (*AbuseService)(&c.common)
+	c.Aftermarket = (*AftermarketService)(&c.common)
+	c.Agreements = (*AgreementsService)(&c.common)
+	c.Certificates = (*CertificatesService)(&c.common)
+	c.Countries = (*CountriesService)(&c.common)
+	c.Domains = (*DomainsService)(&c.common)
+	c.Orders = (*OrdersService)(&c.common)
+	c.Shoppers = (*ShoppersService)(&c.common)
+	c.Subscriptions = (*SubscriptionsService)(&c.common)
+
+	return c, nil
 }

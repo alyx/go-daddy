@@ -1,11 +1,12 @@
-package orders
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
 
-import (
-	godaddy "github.com/alyx/go-daddy"
-)
+package daddy
 
 type BillTo struct {
-	Contact godaddy.Contact
+	Contact Contact
 	TaxID   string
 }
 
@@ -58,7 +59,7 @@ type Order struct {
 	Currency      string
 	Items         []LineItem
 	ParentOrderID string
-	Payments      []Payment
+	Payments      []OrderPayment
 	Pricing       OrderPricing
 }
 
@@ -69,7 +70,7 @@ type OrderFee struct {
 
 type OrderList struct {
 	Orders     []Order
-	Pagination godaddy.Pagination
+	Pagination Pagination
 }
 
 type OrderPricing struct {
@@ -97,7 +98,7 @@ type OrderSummaryPricing struct {
 	Total string
 }
 
-type Payment struct {
+type OrderPayment struct {
 	Amount           int
 	Category         string
 	PaymentProfileID string
