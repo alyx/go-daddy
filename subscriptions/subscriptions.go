@@ -76,13 +76,13 @@ func Get(c *godaddy.Client, id string) (*Subscription, error) {
 }
 
 // Update will update details for the specified Subscription
-func Update(c *godaddy.Client, id string, body *SubscriptionUpdate) error {
-	enc, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
+// func Update(c *godaddy.Client, id string, body *SubscriptionUpdate) error {
+// 	enc, err := json.Marshal(body)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	_, err = c.Patch("/v1/subscriptions/"+id, enc)
+// 	_, err = c.Patch("/v1/subscriptions/"+id, enc)
 
-	return err
-}
+// 	return err
+// }
