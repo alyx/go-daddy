@@ -1,16 +1,21 @@
-package countries
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
 )
+
+type CountriesService service
 
 // Get retrieves summary country information for the provided marketID and
 // filters.
-func Get(c *godaddy.Client, marketID string, regionTypeID int, regionName string, sort string, order string) ([]CountrySummary, error) {
+func (s *CountriesService) Get(marketID string, regionTypeID int, regionName string, sort string, order string) ([]CountrySummary, error) {
 	var res []CountrySummary
-	uri, err := godaddy.BuildQuery("/v1/countries", map[string]interface{}{
+	uri, err := BuildQuery("/v1/countries", map[string]interface{}{
 		"marketId":     marketID,
 		"regionTypeId": regionTypeID,
 		"regionName":   regionName,
@@ -21,7 +26,7 @@ func Get(c *godaddy.Client, marketID string, regionTypeID int, regionName string
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -33,9 +38,9 @@ func Get(c *godaddy.Client, marketID string, regionTypeID int, regionName string
 
 // GetByKey retrieves country and summary state information for provided
 // countryKey
-func GetByKey(c *godaddy.Client, countryKey string, marketID string, sort string, order string) ([]Country, error) {
+func (s *CountriesService) GetByKey(countryKey string, marketID string, sort string, order string) ([]Country, error) {
 	var res []Country
-	uri, err := godaddy.BuildQuery("/v1/countries/"+countryKey, map[string]interface{}{
+	uri, err := BuildQuery("/v1/countries/"+countryKey, map[string]interface{}{
 		"marketId": marketID,
 		"sort":     sort,
 		"order":    order,
@@ -44,7 +49,7 @@ func GetByKey(c *godaddy.Client, countryKey string, marketID string, sort string
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}

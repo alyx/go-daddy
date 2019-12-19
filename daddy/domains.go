@@ -1,19 +1,23 @@
-package domains
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
-	"github.com/alyx/go-daddy/agreements"
 )
+
+type DomainsService service
 
 // List returns a list of DomainSummary objects for all domains owned
 // by the user.
-func List(c *godaddy.Client, statuses []string, statusGroups []string, limit int,
+func (s *DomainsService) List(statuses []string, statusGroups []string, limit int,
 	marker string, includes []string, modifiedDate string) ([]DomainSummary, error) {
 	var res []DomainSummary
 
-	uri, err := godaddy.BuildQuery("/v1/domains", map[string]interface{}{
+	uri, err := BuildQuery("/v1/domains", map[string]interface{}{
 		"statuses":     statuses,
 		"statusGroups": statusGroups,
 		"limit":        limit,
@@ -25,7 +29,7 @@ func List(c *godaddy.Client, statuses []string, statusGroups []string, limit int
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -39,10 +43,10 @@ func List(c *godaddy.Client, statuses []string, statusGroups []string, limit int
 }
 
 // GetAgreements retrieves the legal agreement(s) required to purchase the specified TLD and add-ons
-func GetAgreements(c *godaddy.Client, tlds []string, privacy bool, forTransfer bool) ([]agreements.LegalAgreement, error) {
-	var res []agreements.LegalAgreement
+func (s *DomainsService) GetAgreements(tlds []string, privacy bool, forTransfer bool) ([]LegalAgreement, error) {
+	var res []LegalAgreement
 
-	uri, err := godaddy.BuildQuery("/v1/domains/agreements", map[string]interface{}{
+	uri, err := BuildQuery("/v1/domains/agreements", map[string]interface{}{
 		"tlds":        tlds,
 		"privacy":     privacy,
 		"forTransfer": forTransfer,
@@ -51,7 +55,7 @@ func GetAgreements(c *godaddy.Client, tlds []string, privacy bool, forTransfer b
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -65,10 +69,10 @@ func GetAgreements(c *godaddy.Client, tlds []string, privacy bool, forTransfer b
 }
 
 // GetAvailable determines whether or not the specified domain is available for purchase
-func GetAvailable(c *godaddy.Client, domain string, checkType string, forTransfer bool) (*DomainAvailableResponse, error) {
+func (s *DomainsService) GetAvailable(domain string, checkType string, forTransfer bool) (*DomainAvailableResponse, error) {
 	res := new(DomainAvailableResponse)
 
-	uri, err := godaddy.BuildQuery("/v1/domains/available", map[string]interface{}{
+	uri, err := BuildQuery("/v1/domains/available", map[string]interface{}{
 		"domain":      domain,
 		"checkType":   checkType,
 		"forTransfer": forTransfer,
@@ -77,7 +81,7 @@ func GetAvailable(c *godaddy.Client, domain string, checkType string, forTransfe
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -92,7 +96,7 @@ func GetAvailable(c *godaddy.Client, domain string, checkType string, forTransfe
 
 // GetAvailableBulk determine whether or not the specified domains are
 // available for purchase
-func GetAvailableBulk(c *godaddy.Client, domains []string) (*DomainAvailableBulkMixed, error) {
+func (s *DomainsService) GetAvailableBulk(domains []string) (*DomainAvailableBulkMixed, error) {
 	var res = new(DomainAvailableBulkMixed)
 
 	converted, err := json.Marshal(domains)
@@ -100,7 +104,7 @@ func GetAvailableBulk(c *godaddy.Client, domains []string) (*DomainAvailableBulk
 		return &DomainAvailableBulkMixed{}, err
 	}
 
-	data, err := c.Post("/v1/domains/available", converted)
+	data, err := s.client.Post("/v1/domains/available", converted)
 	if err != nil {
 		return &DomainAvailableBulkMixed{}, err
 	}
@@ -114,8 +118,8 @@ func GetAvailableBulk(c *godaddy.Client, domains []string) (*DomainAvailableBulk
 }
 
 // ValidateContactSchema validates the request body using the Domain Contact Validation Schema for specified domains.
-func ValidateContactSchema(c *godaddy.Client, marketID string, body *DomainContactsBulk) (bool, error) {
-	uri, err := godaddy.BuildQuery("/v1/domains/contacts/validate", map[string]interface{}{
+func (s *DomainsService) ValidateContactSchema(marketID string, body *DomainContactsBulk) (bool, error) {
+	uri, err := BuildQuery("/v1/domains/contacts/validate", map[string]interface{}{
 		"marketId": marketID,
 	})
 	if err != nil {
@@ -127,7 +131,7 @@ func ValidateContactSchema(c *godaddy.Client, marketID string, body *DomainConta
 		return false, err
 	}
 
-	_, err = c.Post(uri, enc)
+	_, err = s.client.Post(uri, enc)
 	if err != nil {
 		return false, err
 	}
@@ -135,18 +139,18 @@ func ValidateContactSchema(c *godaddy.Client, marketID string, body *DomainConta
 	return true, nil
 }
 
-func GetPurchaseSchema(tld string) { return }
+func (s *DomainsService) GetPurchaseSchema(tld string) { return }
 
-func ValidatePurchaseSchema() { return }
+func (s *DomainsService) ValidatePurchaseSchema() { return }
 
 // GetSuggestions suggests alternate Domain names based on a seed Domain,
 // a set of keywords, or the shopper's purchase history
-func GetSuggestions(c *godaddy.Client, query string, country string, city string,
+func (s *DomainsService) GetSuggestions(query string, country string, city string,
 	sources []string, tlds []string, lengthMax int, lengthMin int, limit int,
 	waitMs int) ([]DomainSuggestion, error) {
 	var suggestions []DomainSuggestion
 
-	uri, err := godaddy.BuildQuery("/v1/domains/suggest", map[string]interface{}{
+	uri, err := BuildQuery("/v1/domains/suggest", map[string]interface{}{
 		"query":     query,
 		"country":   country,
 		"city":      city,
@@ -161,7 +165,7 @@ func GetSuggestions(c *godaddy.Client, query string, country string, city string
 		return nil, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -175,10 +179,10 @@ func GetSuggestions(c *godaddy.Client, query string, country string, city string
 }
 
 // GetTLDs retrieves a list of TLDs supported and enabled for sale
-func GetTLDs(c *godaddy.Client) ([]TldSummary, error) {
+func (s *DomainsService) GetTLDs() ([]TldSummary, error) {
 	var tlds []TldSummary
 
-	data, err := c.Get("/v1/domains/tlds")
+	data, err := s.client.Get("/v1/domains/tlds")
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +196,7 @@ func GetTLDs(c *godaddy.Client) ([]TldSummary, error) {
 }
 
 // Purchase and register the specified Domain
-func Purchase(c *godaddy.Client, body *DomainPurchase) (*DomainPurchaseResponse, error) {
+func (s *DomainsService) Purchase(body *DomainPurchase) (*DomainPurchaseResponse, error) {
 	res := new(DomainPurchaseResponse)
 
 	enc, err := json.Marshal(body)
@@ -200,7 +204,7 @@ func Purchase(c *godaddy.Client, body *DomainPurchase) (*DomainPurchaseResponse,
 		return res, err
 	}
 
-	data, err := c.Post("/v1/domains/purchase", enc)
+	data, err := s.client.Post("/v1/domains/purchase", enc)
 	if err != nil {
 		return res, err
 	}
@@ -211,17 +215,17 @@ func Purchase(c *godaddy.Client, body *DomainPurchase) (*DomainPurchaseResponse,
 }
 
 // Delete cancels a purchased domain
-func Delete(c *godaddy.Client, domain string) error {
-	_, err := c.Delete("/v1/domains/"+domain, nil)
+func (s *DomainsService) Delete(domain string) error {
+	_, err := s.client.Delete("/v1/domains/"+domain, nil)
 
 	return err
 }
 
 // Get retrieves details for the specified Domain
-func Get(c *godaddy.Client, domain string) (*DomainDetail, error) {
+func (s *DomainsService) Get(domain string) (*DomainDetail, error) {
 	res := new(DomainDetail)
 
-	data, err := c.Get("/v1/domains/" + domain)
+	data, err := s.client.Get("/v1/domains/" + domain)
 	if err != nil {
 		return res, err
 	}
@@ -232,38 +236,38 @@ func Get(c *godaddy.Client, domain string) (*DomainDetail, error) {
 }
 
 // Update details for the specified Domain
-func Update(c *godaddy.Client, domain string, body *DomainUpdate) error {
+func (s *DomainsService) Update(domain string, body *DomainUpdate) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Patch("/v1/domains/"+domain, enc)
+	_, err = s.client.Patch("/v1/domains/"+domain, enc)
 
 	return err
 }
 
 // UpdateContacts updates contacts for the specified Domain
-func UpdateContacts(c *godaddy.Client, domain string, body *DomainContacts) error {
+func (s *DomainsService) UpdateContacts(domain string, body *DomainContacts) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Patch("/v1/domains/"+domain+"/contacts", enc)
+	_, err = s.client.Patch("/v1/domains/"+domain+"/contacts", enc)
 
 	return err
 }
 
 // DeletePrivacy submits a privacy cancellation request for the given Domain
-func DeletePrivacy(c *godaddy.Client, domain string) error {
-	_, err := c.Delete("/v1/domains/"+domain+"/privacy", nil)
+func (s *DomainsService) DeletePrivacy(domain string) error {
+	_, err := s.client.Delete("/v1/domains/"+domain+"/privacy", nil)
 
 	return err
 }
 
 // PurchasePrivacy purchases privacy for a specified Domain
-func PurchasePrivacy(c *godaddy.Client, domain string, body *PrivacyPurchase) (*DomainPurchaseResponse, error) {
+func (s *DomainsService) PurchasePrivacy(domain string, body *PrivacyPurchase) (*DomainPurchaseResponse, error) {
 	res := new(DomainPurchaseResponse)
 
 	enc, err := json.Marshal(body)
@@ -271,7 +275,7 @@ func PurchasePrivacy(c *godaddy.Client, domain string, body *PrivacyPurchase) (*
 		return res, err
 	}
 
-	data, err := c.Post("/v1/domains/"+domain+"/privacy/purchase", enc)
+	data, err := s.client.Post("/v1/domains/"+domain+"/privacy/purchase", enc)
 	if err != nil {
 		return res, err
 	}
@@ -282,59 +286,59 @@ func PurchasePrivacy(c *godaddy.Client, domain string, body *PrivacyPurchase) (*
 }
 
 // AddRecords adds the specified DNS Records to the specified Domain
-func AddRecords(c *godaddy.Client, domain string, body []DNSRecord) error {
+func (s *DomainsService) AddRecords(domain string, body []DNSRecord) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Patch("/v1/domains/"+domain+"/records", enc)
+	_, err = s.client.Patch("/v1/domains/"+domain+"/records", enc)
 
 	return err
 }
 
 // ReplaceRecords replaces all DNS Records for the specified Domain
-func ReplaceRecords(c *godaddy.Client, domain string, body []DNSRecord) error {
+func (s *DomainsService) ReplaceRecords(domain string, body []DNSRecord) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Put("/v1/domains/"+domain+"/records", enc)
+	_, err = s.client.Put("/v1/domains/"+domain+"/records", enc)
 
 	return err
 }
 
 // ReplaceRecordsByType replaces all DNS Records for the specified Domain with
 // the specified Type
-func ReplaceRecordsByType(c *godaddy.Client, domain string, dnstype string, body []DNSRecord) error {
+func (s *DomainsService) ReplaceRecordsByType(domain string, dnstype string, body []DNSRecord) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Put("/v1/domains/"+domain+"/records/"+dnstype, enc)
+	_, err = s.client.Put("/v1/domains/"+domain+"/records/"+dnstype, enc)
 
 	return err
 }
 
 // ReplaceRecordsByTypeAndName replaces all DNS Records for the specified
 // Domain with the specified Type and Name
-func ReplaceRecordsByTypeAndName(c *godaddy.Client, domain string, dnstype string, name string, body []DNSRecord) error {
+func (s *DomainsService) ReplaceRecordsByTypeAndName(domain string, dnstype string, name string, body []DNSRecord) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Put("/v1/domains/"+domain+"/records/"+dnstype+"/"+name, enc)
+	_, err = s.client.Put("/v1/domains/"+domain+"/records/"+dnstype+"/"+name, enc)
 
 	return err
 }
 
-func GetRecords() { return }
+func (s *DomainsService) GetRecords() { return }
 
 // Renew purchases a renewal for the specified Domain
-func Renew(c *godaddy.Client, domain string, body *DomainRenew) (*DomainPurchaseResponse, error) {
+func (s *DomainsService) Renew(domain string, body *DomainRenew) (*DomainPurchaseResponse, error) {
 	res := new(DomainPurchaseResponse)
 
 	enc, err := json.Marshal(body)
@@ -342,7 +346,7 @@ func Renew(c *godaddy.Client, domain string, body *DomainRenew) (*DomainPurchase
 		return res, err
 	}
 
-	data, err := c.Post("/v1/domains/"+domain+"/renew", enc)
+	data, err := s.client.Post("/v1/domains/"+domain+"/renew", enc)
 	if err != nil {
 		return res, err
 	}
@@ -353,7 +357,7 @@ func Renew(c *godaddy.Client, domain string, body *DomainRenew) (*DomainPurchase
 }
 
 // Transfer purchases and starts or restarts a transfer process
-func Transfer(c *godaddy.Client, domain string, body *DomainTransferIn) (*DomainPurchaseResponse, error) {
+func (s *DomainsService) Transfer(domain string, body *DomainTransferIn) (*DomainPurchaseResponse, error) {
 	res := new(DomainPurchaseResponse)
 
 	enc, err := json.Marshal(body)
@@ -361,7 +365,7 @@ func Transfer(c *godaddy.Client, domain string, body *DomainTransferIn) (*Domain
 		return res, err
 	}
 
-	data, err := c.Post("/v1/domains/"+domain+"/transfer", enc)
+	data, err := s.client.Post("/v1/domains/"+domain+"/transfer", enc)
 	if err != nil {
 		return res, err
 	}
@@ -372,8 +376,8 @@ func Transfer(c *godaddy.Client, domain string, body *DomainTransferIn) (*Domain
 }
 
 // SendRegistrantEmail re-sends Contact E-Mail Verification for specified Domain
-func SendRegistrantEmail(c *godaddy.Client, domain string) error {
-	_, err := c.Post("/v1/domains/"+domain+"/verifyRegistrantEmail", nil)
+func (s *DomainsService) SendRegistrantEmail(domain string) error {
+	_, err := s.client.Post("/v1/domains/"+domain+"/verifyRegistrantEmail", nil)
 
 	return err
 }
@@ -381,22 +385,22 @@ func SendRegistrantEmail(c *godaddy.Client, domain string) error {
 // v2
 
 // RemoveForward submits a forwarding cancellation request for the given fqdn
-func RemoveForward(c *godaddy.Client, customer string, fqdn string) error {
-	_, err := c.Delete("/v2/customers/"+customer+"/domains/forwards/"+fqdn, nil)
+func (s *DomainsService) RemoveForward(customer string, fqdn string) error {
+	_, err := s.client.Delete("/v2/customers/"+customer+"/domains/forwards/"+fqdn, nil)
 
 	return err
 }
 
 // GetForward retrieves the forwarding information for the given fqdn
-func GetForward(c *godaddy.Client, customer string, fqdn string, subdomains bool) ([]DomainForwarding, error) {
+func (s *DomainsService) GetForward(customer string, fqdn string, subdomains bool) ([]DomainForwarding, error) {
 	var res []DomainForwarding
-	uri, err := godaddy.BuildQuery("/v2/customers/"+customer+"/domains/forwards/"+fqdn,
+	uri, err := BuildQuery("/v2/customers/"+customer+"/domains/forwards/"+fqdn,
 		map[string]interface{}{"includeSubs": subdomains})
 	if err != nil {
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -407,13 +411,13 @@ func GetForward(c *godaddy.Client, customer string, fqdn string, subdomains bool
 }
 
 // UpdateForward modifies the forwarding information for the given fqdn
-func UpdateForward(c *godaddy.Client, customer string, fqdn string, body *DomainForwardingCreate) error {
+func (s *DomainsService) UpdateForward(customer string, fqdn string, body *DomainForwardingCreate) error {
 	enc, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
 
-	_, err = c.Put("/v2/customers/"+customer+"/domains/forwards/"+fqdn, enc)
+	_, err = s.client.Put("/v2/customers/"+customer+"/domains/forwards/"+fqdn, enc)
 
 	return err
 }

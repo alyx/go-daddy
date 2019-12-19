@@ -1,16 +1,21 @@
-package subscriptions
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
 )
 
+type SubscriptionsService service
+
 // List of Subscriptions for a specified Shopper
-func List(c *godaddy.Client, productGroupKeys []string, includes []string, offset int, limit int, sort string) (*SubscriptionList, error) {
+func (s *SubscriptionsService) List(productGroupKeys []string, includes []string, offset int, limit int, sort string) (*SubscriptionList, error) {
 	res := new(SubscriptionList)
 
-	uri, err := godaddy.BuildQuery("/v1/subscriptions", map[string]interface{}{
+	uri, err := BuildQuery("/v1/subscriptions", map[string]interface{}{
 		"productGroupKeys": productGroupKeys,
 		"includes":         includes,
 		"offset":           offset,
@@ -21,7 +26,7 @@ func List(c *godaddy.Client, productGroupKeys []string, includes []string, offse
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -35,10 +40,10 @@ func List(c *godaddy.Client, productGroupKeys []string, includes []string, offse
 }
 
 // ListProductGroups retrieves a list of Product Groups for a specific Shopper
-func ListProductGroups(c *godaddy.Client) ([]ProductGroup, error) {
+func (s *SubscriptionsService) ListProductGroups() ([]ProductGroup, error) {
 	var res []ProductGroup
 
-	data, err := c.Get("/v1/subscriptions/productGroups")
+	data, err := s.client.Get("/v1/subscriptions/productGroups")
 	if err != nil {
 		return res, err
 	}
@@ -52,17 +57,17 @@ func ListProductGroups(c *godaddy.Client) ([]ProductGroup, error) {
 }
 
 // Delete will cancel the specified Subscription
-func Delete(c *godaddy.Client, id string) error {
-	_, err := c.Delete("/v1/subscriptions/"+id, nil)
+func (s *SubscriptionsService) Delete(id string) error {
+	_, err := s.client.Delete("/v1/subscriptions/"+id, nil)
 
 	return err
 }
 
 // Get will retrieve details for the specified Subscription
-func Get(c *godaddy.Client, id string) (*Subscription, error) {
+func (s *SubscriptionsService) Get(id string) (*Subscription, error) {
 	res := new(Subscription)
 
-	data, err := c.Get("/v1/subscriptions/" + id)
+	data, err := s.client.Get("/v1/subscriptions/" + id)
 	if err != nil {
 		return res, err
 	}

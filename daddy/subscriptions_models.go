@@ -1,8 +1,9 @@
-package subscriptions
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
 
-import (
-	godaddy "github.com/alyx/go-daddy"
-)
+package daddy
 
 type ProductGroup struct {
 	ProductGroupKey   string
@@ -42,7 +43,7 @@ type SubscriptionBilling struct {
 }
 
 type SubscriptionList struct {
-	Pagination    *godaddy.Pagination
+	Pagination    *Pagination
 	Subscriptions []Subscription
 }
 

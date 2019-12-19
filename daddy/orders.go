@@ -1,17 +1,22 @@
-package orders
+// Copyright 2019 A. Wolcott. All rights reserved.
+//
+// Use of this source code is governed by the ISC
+// license that can be found in the LICENSE file.
+
+package daddy
 
 import (
 	"encoding/json"
-
-	godaddy "github.com/alyx/go-daddy"
 )
 
+type OrdersService service
+
 // List retrieves a list of orders for the authenticated shopper.
-func List(c *godaddy.Client, periodStart string, periodEnd string, domain string,
+func (s *OrdersService) List(periodStart string, periodEnd string, domain string,
 	productGroupID int, paymentProfileID int, parentOrderID string, offset int,
 	limit int, sort string) (*OrderList, error) {
 	res := new(OrderList)
-	uri, err := godaddy.BuildQuery("/v1/orders", map[string]interface{}{
+	uri, err := BuildQuery("/v1/orders", map[string]interface{}{
 		"periodStart":      periodStart,
 		"periodEnd":        periodEnd,
 		"domain":           domain,
@@ -26,7 +31,7 @@ func List(c *godaddy.Client, periodStart string, periodEnd string, domain string
 		return res, err
 	}
 
-	data, err := c.Get(uri)
+	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
 	}
@@ -37,10 +42,10 @@ func List(c *godaddy.Client, periodStart string, periodEnd string, domain string
 }
 
 // Get retrieves details for the specified order.
-func Get(c *godaddy.Client, orderID string) (*Order, error) {
+func (s *OrdersService) Get(orderID string) (*Order, error) {
 	res := new(Order)
 
-	data, err := c.Get("/v1/orders/" + orderID)
+	data, err := s.client.Get("/v1/orders/" + orderID)
 	if err != nil {
 		return res, err
 	}
