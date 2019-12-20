@@ -143,8 +143,12 @@ func (s *DomainsService) ValidateContactSchema(marketID string, body *DomainCont
 	return true, nil
 }
 
+// GetPurchaseSchema retrieves the schema to be submitted when registering a
+// Domain for the specified TLD
 func (s *DomainsService) GetPurchaseSchema(tld string) { return }
 
+// ValidatePurchaseSchema validates the request body using the Domain Purchase
+// Schema for the specified TLD
 func (s *DomainsService) ValidatePurchaseSchema() { return }
 
 // GetSuggestions suggests alternate Domain names based on a seed Domain,
@@ -339,7 +343,36 @@ func (s *DomainsService) ReplaceRecordsByTypeAndName(domain string, dnstype stri
 	return err
 }
 
-func (s *DomainsService) GetRecords() { return }
+// GetRecords trtrieves DNS Records for the specified Domain, optionally
+// with the specified Type and/or Name
+func (s *DomainsService) GetRecords(domain string, dnstype string, name string, offset int, limit int) ([]DNSRecord, error) {
+	var res []DNSRecord
+
+	uri := "/v1/domains/" + domain + "/records"
+	if dnstype != "" {
+		uri = uri + "/" + dnstype
+	}
+	if name != "" {
+		uri = uri + "/" + name
+	}
+
+	uri, err := BuildQuery(uri, map[string]interface{}{
+		"offset": offset,
+		"limit":  limit,
+	})
+	if err != nil {
+		return res, err
+	}
+
+	data, err := s.client.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
 
 // Renew purchases a renewal for the specified Domain
 func (s *DomainsService) Renew(domain string, body *DomainRenew) (*DomainPurchaseResponse, error) {
