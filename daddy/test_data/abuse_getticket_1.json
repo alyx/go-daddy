@@ -1,0 +1,11 @@
+{
+  "closed": true,
+  "closedAt": "2019-12-20T01:46:51Z",
+  "createdAt": "2019-11-20T01:46:51Z",
+  "domainIp": "example.org",
+  "reporter": "12345",
+  "source": "https://example.org",
+  "target": "Example, Inc",
+  "ticketId": "1",
+  "type": "PHISHING"
+}
