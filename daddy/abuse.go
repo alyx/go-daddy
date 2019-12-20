@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// AbuseService handles communication with the abuse related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/abuse
 type AbuseService service
 
 // ListTickets lists all abuse tickets ids that match user provided filters

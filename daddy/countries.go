@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// CountriesService handles communication with the country search
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/countries
 type CountriesService service
 
 // Get retrieves summary country information for the provided marketID and

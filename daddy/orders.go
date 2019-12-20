@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// OrdersService handles communication with the orders related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/orders
 type OrdersService service
 
 // List retrieves a list of orders for the authenticated shopper.

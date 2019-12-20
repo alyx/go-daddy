@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// ShoppersService handles communication with the shoppers related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/shoppers
 type ShoppersService service
 
 // Create a Subaccount owned by the authenticated Reseller

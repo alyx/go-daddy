@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// SubscriptionsService handles communication with the subscriptions related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/subscriptions
 type SubscriptionsService service
 
 // List of Subscriptions for a specified Shopper

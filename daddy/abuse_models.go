@@ -5,7 +5,7 @@
 
 package daddy
 
-// Ticket defines the content of a ticket generated from GetTicket()
+// AbuseTicket represents an abuse ticket
 type AbuseTicket struct {
 	Closed    bool
 	ClosedAt  string
@@ -18,6 +18,7 @@ type AbuseTicket struct {
 	Type      string
 }
 
+// AbuseTicketCreate is a representation of a new abuse ticket to be submitted
 type AbuseTicketCreate struct {
 	Info        string
 	InfoURL     string
@@ -28,10 +29,12 @@ type AbuseTicketCreate struct {
 	Type        string
 }
 
+// AbuseTicketID represents an ID corresponding to an abuse ticket
 type AbuseTicketID struct {
 	TicketID string
 }
 
+// AbuseTicketList is a paginated listing of ticket IDs
 type AbuseTicketList struct {
 	Pagination Pagination
 	TicketIDs  []string

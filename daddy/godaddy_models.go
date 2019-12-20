@@ -54,6 +54,7 @@ type ErrorLimit struct {
 	RetryAfterSec int
 }
 
+// Address represents a billing/mailing address for an entity
 type Address struct {
 	Address1   string
 	Address2   string
@@ -63,6 +64,7 @@ type Address struct {
 	State      string
 }
 
+// Contact represents a domain registrant/contact/customer/etc.
 type Contact struct {
 	AddressMailing Address
 	Email          string
@@ -75,6 +77,7 @@ type Contact struct {
 	Phone          string
 }
 
+// Pagination represents the list of pages in a multi-page response
 type Pagination struct {
 	First    string
 	Last     string

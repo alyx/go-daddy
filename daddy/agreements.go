@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// AgreementsService handles communication with the legal agreements related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/agreements
 type AgreementsService service
 
 // Get retrieves Legal Agreements for provided agreements keys

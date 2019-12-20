@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// CertificatesService handles communication with the certificates related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/certificates
 type CertificatesService service
 
 // Create will create a pending order for a certificate

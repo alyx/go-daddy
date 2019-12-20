@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// DomainsService handles communication with the domains related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/domains
 type DomainsService service
 
 // List returns a list of DomainSummary objects for all domains owned

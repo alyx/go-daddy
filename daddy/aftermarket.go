@@ -9,6 +9,10 @@ import (
 	"encoding/json"
 )
 
+// AftermarketService handles communication with the aftermarket related
+// methods of the GoDaddy API.
+//
+// GoDaddy API docs: https://developer.godaddy.com/doc/endpoint/aftermarket
 type AftermarketService service
 
 // DeleteListings removes listings from GoDaddy Auction
