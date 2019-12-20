@@ -14,7 +14,7 @@ compiler. At time of publishing, December 2019, the most recent version is
 `go-daddy` can be installed via `go get`:
 
 ```bash
-$ go get github.com/alyx/go-daddy
+$ go get github.com/alyx/go-daddy/daddy
 ```
 
 ## Configuration
@@ -32,28 +32,27 @@ is a value declaring if your API calls should point to the GoDaddy _OTE_
 specifies that you do wish to use the test environment, and `false` is the
 Production environment.
 
-If the environmental variables `GODADDY_API_KEY` or `GODADDY_API_SECRET` are
-defined, these values will override the `APIKey` and `SecretKey` arguments
-in `NewClient()`, respectively. Additionally, if the `GODADDY_API_URL`
-environmental variable is defined, this value will override both the production
-and OTE API URLs.
-
 ## Usage
 
-To properly use `go-daddy`, you will need to import both the base `go-daddy` package,
-as well as the packages for any endpoints you wish to communicate with in your program.
+```
+import "github.com/alyx/go-daddy/daddy"
+```
 
-The available packages for import are:
+Construct a new GoDaddy client, then use the various services on the client to
+access different parts of the GoDaddy API. For example:
 
-* `github.com/alyx/go-daddy`
-* `github.com/alyx/go-daddy/abuse`
-* `github.com/alyx/go-daddy/aftermarket`
-* `github.com/alyx/go-daddy/agreements`
-* `github.com/alyx/go-daddy/certificates`
-* `github.com/alyx/go-daddy/domains`
-* `github.com/alyx/go-daddy/orders`
-* `github.com/alyx/go-daddy/shoppers`
-* `github.com/alyx/go-daddy/subscriptions`
+```
+client := daddy.NewClient("API Key", "Secret Key", true)
+
+// list all domains owned by the owner of the API key
+domains, err := client.Domains.List(nil, nil, 0, "", nil, "")
+```
+
+The services of a client divide the API into chunks corresponding to the
+structure of the GoDaddy API documentation at https://developer.godaddy.com/doc
+
+The current available client services are:
+`.Abuse, .Aftermarket, .Agreements, .Certificates, .Countries, .Domains, .Orders, .Shoppers, .Subscriptions`
 
 ### Example
 
@@ -66,14 +65,13 @@ package main
 import (
 	"log"
 
-	godaddy "github.com/alyx/go-daddy"
-	"github.com/alyx/go-daddy/domains"
+	"github.com/alyx/go-daddy"
 )
 
 func main() {
-	client, _ := godaddy.NewClient("", "", false)
+	client, _ := daddy.NewClient("abc", "def", false)
 
-	myDomains, err := domains.List(client, nil, nil, 0, "", nil, "")
+	myDomains, err := client.Domains.List(nil, nil, 0, "", nil, "")
 	if err != nil {
 		log.Fatal(err)
 	}
