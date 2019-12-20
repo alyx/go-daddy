@@ -1,5 +1,8 @@
 # Unofficial GoDaddy API Client for Go
 
+[![GoDoc](https://godoc.org/github.com/alyx/go-daddy/github?status.svg)](https://godoc.org/github.com/alyx/go-daddy/github)
+[![Go Report Card](https://goreportcard.com/badge/github.com/alyx/go-daddy)](https://goreportcard.com/report/github.com/alyx/go-daddy)
+
 `go-daddy` provides a GoDaddy API client for the Go language. This package
 provides a `net/http`-based wrapper around the [GoDaddy Developer API](https://developer.godaddy.com/).
 
