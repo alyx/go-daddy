@@ -190,31 +190,31 @@ func BuildQuery(uri string, values map[string]interface{}) (string, error) {
 func NewClient(key string, secret string, ote bool) (*Client, error) {
 	if ote {
 		return NewClientWithURL(key, secret, "https://api.ote-godaddy.com")
-	} else {
-		return NewClientWithURL(key, secret, "https://api.godaddy.com")
 	}
+
+	return NewClientWithURL(key, secret, "https://api.godaddy.com")
 }
 
+// NewClientWithURL functions similarly to NewClient, with the exception of
+// accepting any URL as the endpoint as opposed to pre-setting the endpoint URL
+// based on official GoDaddy endpoints.
 func NewClientWithURL(key string, secret string, url string) (*Client, error) {
 	c := new(Client)
 
 	if key == "" {
 		return nil, errors.New("Missing GoDaddy API key")
-	} else {
-		c.Key = key
 	}
+	c.Key = key
 
 	if secret == "" {
 		return nil, errors.New("Missing GoDaddy API secret")
-	} else {
-		c.Secret = secret
 	}
+	c.Secret = secret
 
 	if url == "" {
 		return nil, errors.New("Missing API endpoint")
-	} else {
-		c.BaseURL = url
 	}
+	c.BaseURL = url
 
 	c.common.client = c
 	c.Abuse = (*AbuseService)(&c.common)
