@@ -32,6 +32,10 @@ func (s *AbuseService) ListTickets(ticketType string, closed bool, sourceDomainO
 		"offset":           offset,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	data, err := s.client.Get(uri)
 	if err != nil {
 		return res, err
@@ -47,6 +51,9 @@ func (s *AbuseService) NewTicket(ticket *AbuseTicketCreate) (*AbuseTicketID, err
 	var id = new(AbuseTicketID)
 
 	enc, err := json.Marshal(ticket)
+	if err != nil {
+		return nil, err
+	}
 	data, err := s.client.Post("/v1/abuse/tickets", enc)
 	if err != nil {
 		return id, err

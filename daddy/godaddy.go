@@ -202,17 +202,17 @@ func NewClientWithURL(key string, secret string, url string) (*Client, error) {
 	c := new(Client)
 
 	if key == "" {
-		return nil, errors.New("Missing GoDaddy API key")
+		return nil, errors.New("missing GoDaddy API key")
 	}
 	c.Key = key
 
 	if secret == "" {
-		return nil, errors.New("Missing GoDaddy API secret")
+		return nil, errors.New("missing GoDaddy API secret")
 	}
 	c.Secret = secret
 
 	if url == "" {
-		return nil, errors.New("Missing API endpoint")
+		return nil, errors.New("missing API endpoint")
 	}
 	c.BaseURL = url
 

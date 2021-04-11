@@ -5,12 +5,14 @@
 
 package daddy
 
+// Consent represents the agreement to terms for a service
 type Consent struct {
 	AgreedAt      string
 	AgreedBy      string
 	AgreementKeys []string
 }
 
+// DNSRecord represents an individual DNS record
 type DNSRecord struct {
 	Data     string
 	Name     string
@@ -23,6 +25,8 @@ type DNSRecord struct {
 	Weight   int
 }
 
+// DomainAvailableResponse contains the current availability of a domain, as
+// well as data related to purchasing the domain
 type DomainAvailableResponse struct {
 	Available  bool
 	Currency   string
@@ -32,6 +36,7 @@ type DomainAvailableResponse struct {
 	Price      int
 }
 
+// DomainAvailableError contains error information if a domain availability check fails
 type DomainAvailableError struct {
 	Code    string
 	Domain  string
@@ -40,11 +45,14 @@ type DomainAvailableError struct {
 	Status  int
 }
 
+// DomainAvailableBulkMixed is a series of arries for domain availability
+// responses and errors when doing a bulk request
 type DomainAvailableBulkMixed struct {
 	Domains []DomainAvailableResponse
 	Errors  []DomainAvailableError
 }
 
+// DomainContacts contains the four types of WHOIS contacts for a domain
 type DomainContacts struct {
 	Admin      Contact
 	Billing    Contact

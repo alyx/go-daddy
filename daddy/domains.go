@@ -145,11 +145,11 @@ func (s *DomainsService) ValidateContactSchema(marketID string, body *DomainCont
 
 // GetPurchaseSchema retrieves the schema to be submitted when registering a
 // Domain for the specified TLD
-func (s *DomainsService) GetPurchaseSchema(tld string) { return }
+func (s *DomainsService) GetPurchaseSchema(tld string) {}
 
 // ValidatePurchaseSchema validates the request body using the Domain Purchase
 // Schema for the specified TLD
-func (s *DomainsService) ValidatePurchaseSchema() { return }
+func (s *DomainsService) ValidatePurchaseSchema() {}
 
 // GetSuggestions suggests alternate Domain names based on a seed Domain,
 // a set of keywords, or the shopper's purchase history

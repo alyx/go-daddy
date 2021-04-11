@@ -83,6 +83,10 @@ func (s *ShoppersService) Delete(shopper string, auditClientIP string) error {
 		"auditClientIp": auditClientIP,
 	})
 
+	if err != nil {
+		return err
+	}
+
 	_, err = s.client.Delete(uri, nil)
 
 	return err
