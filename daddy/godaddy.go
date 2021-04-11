@@ -173,12 +173,8 @@ func BuildQuery(uri string, values map[string]interface{}) (string, error) {
 }
 
 // NewClient accepts three inputs:
-// - key is a string containing your GoDaddy API key. If this value is empty,
-//   NewClient will attempt to find GODADDY_API_KEY in your environmental
-//   variables.
-// - secret is a string containing your GoDaddy API secret. IF this value is
-//   empty, NewClient will attept to find GODADDY_API_SECRET in your
-//   environmental variables.
+// - key is a string containing your GoDaddy API key
+// - secret is a string containing your GoDaddy API secret
 // - ote is a bool, true runs your API calls against the GoDaddy test
 //   environment at https://api.ote-godaddy.com/, false runs your API
 //   calls against the production environment, https://api.godaddy.com/
