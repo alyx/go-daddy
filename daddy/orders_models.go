@@ -58,6 +58,7 @@ type Order struct {
 	CreatedAt     string
 	Currency      string
 	Items         []LineItem
+	OrderID       string
 	ParentOrderID string
 	Payments      []OrderPayment
 	Pricing       OrderPricing
