@@ -5,6 +5,11 @@
 
 package daddy
 
+type ListCertificates struct {
+	Certificates []Certificate
+	Pagination   Pagination
+}
+
 type Certificate struct {
 	CertificateID           string
 	CommonName              string
