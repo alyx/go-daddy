@@ -1,3 +1,3 @@
-module github.com/alyx/go-daddy
+module github.com/turbot/go-daddy
 
 go 1.16

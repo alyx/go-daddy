@@ -50,6 +50,29 @@ func (s *CertificatesService) Validate(body *CertificateCreate) error {
 }
 
 // Get retrieves certificate details for a specified certificate
+func (s *CertificatesService) ListByCustomer(customerId string, limit int,
+	offset int) (*ListCertificates, error) {
+	res := new(ListCertificates)
+
+		uri, err := BuildQuery("/v2/" + customerId + "/certificates/", map[string]interface{}{
+		"limit":            limit,
+		"offset":           offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := s.client.Get(uri)
+	if err != nil {
+		return res, err
+	}
+
+	err = json.Unmarshal(data, &res)
+
+	return res, err
+}
+
+// Get retrieves certificate details for a specified certificate
 func (s *CertificatesService) Get(id string) (*Certificate, error) {
 	res := new(Certificate)
 

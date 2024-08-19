@@ -14,7 +14,7 @@ type ProductGroup struct {
 // Subscription represents a product subscription
 type Subscription struct {
 	Addons           []SubscriptionAddon
-	Billing          []SubscriptionBilling
+	Billing          SubscriptionBilling
 	Cancelable       bool
 	CreatedAt        string
 	ExpiresAt        string

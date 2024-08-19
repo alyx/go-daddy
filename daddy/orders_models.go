@@ -12,7 +12,7 @@ type BillTo struct {
 
 type LineItem struct {
 	Domains      []string
-	Period       int
+	Period       float32
 	PeriodUnit   string
 	Pfid         int
 	Pricing      LineItemPricing
@@ -21,6 +21,24 @@ type LineItem struct {
 }
 
 type LineItemPricing struct {
+	Discount   int
+	Fees       OrderFee
+	List       int
+	Sale       int
+	Savings    int
+	Subtotal   int
+	Taxes      int
+	TaxDetails []LineItemPricingTaxDetails
+	Unit       LineItemPricingUnit
+}
+
+type LineItemPricingTaxDetails struct {
+	Rate        float64
+	Amount      float64
+	Impositions []OrderImpositions
+}
+
+type LineItemPricingUnit struct {
 	Discount int
 	Fees     OrderFee
 	List     int
@@ -28,7 +46,13 @@ type LineItemPricing struct {
 	Savings  int
 	Subtotal int
 	Taxes    int
-	Unit     int //XXX: Is this right
+}
+
+type OrderImpositions struct {
+	TaxRate           float64
+	TaxAmount         float64
+	TaxableAmount     float64
+	TaxImpositionType string
 }
 
 type LineItemSummary struct {
@@ -58,6 +82,7 @@ type Order struct {
 	CreatedAt     string
 	Currency      string
 	Items         []LineItem
+	OrderID       string
 	ParentOrderID string
 	Payments      []OrderPayment
 	Pricing       OrderPricing
